@@ -62,11 +62,13 @@ Starting branch: `main`
   - Format: `# <title> - Questions` heading; optional intro paragraph; per question `**Question N** (P points)` with `(P points)` optional and `(Select all that apply)` marking multi-select; stem in markdown (paragraphs, bold, italic, inline code, code blocks, lists, tables); options `- a. text` to `- e. text`; true/false = single choice with `- a. True` / `- b. False`; written = no options, optional `**Word limit**: Maximum N words.`, default 250.
   - "no spaces are used for file names, use '-'" (user). Rule: spaces become `-`; drop characters other than letters, digits, `.`, `_`, `-`; collapse repeated `-`; trim `-` at ends; keep case. `Finals Practice Quiz 2 (Short)` gives `Finals-Practice-Quiz-2-Short-Questions.md` and `Finals-Practice-Quiz-2-Short-Answers.md`. Applies to `.md` and `.docx`.
 - **Acceptance criteria:**
-  - [ ] `grep -l questions-format.md skills/format-quiz-docs/quiz-rules.md skills/format-quiz-docs/SKILL.md skills/generate-quiz-docs/SKILL.md` lists all three files.
-  - [ ] `grep -rn "<topic> - Questions\|<topic> - Answers" skills/` prints nothing.
-  - [ ] `quiz-rules.md` states the no-space rule with the `Finals-Practice-Quiz-2-Short-Questions.md` example (read).
-  - [ ] `questions-format.md` covers every item in the Format decision above (read).
+  - [x] `grep -l questions-format.md skills/format-quiz-docs/quiz-rules.md skills/format-quiz-docs/SKILL.md skills/generate-quiz-docs/SKILL.md` lists all three files.
+  - [x] `grep -rn "<topic> - Questions\|<topic> - Answers" skills/` prints nothing.
+  - [x] `quiz-rules.md` states the no-space rule with the `Finals-Practice-Quiz-2-Short-Questions.md` example (read).
+  - [x] `questions-format.md` covers every item in the Format decision above (read).
 - **Doc deltas:** `questions-format.md` is the doc. README: filename rule.
+  - `questions-format.md` adds rules the Format decision left open: exactly one `#` heading; `(1 point)` singular; options are the last block of a question, one line each, letters from `a` with no gaps, at least 2; a stem bullet must not start with `a. `–`e. ` so it is never read as an option; `&nbsp;` lines as answer space in `.md` (matches the example). Why: `/build-quiz-html` parses this file at runtime, so the parse must be unambiguous.
+  - `quiz-rules.md` now says true/false questions get options `a. True` / `b. False` (was "mark as such"). Why: matches the Format decision.
 
 ### S2 — Single-file template
 
