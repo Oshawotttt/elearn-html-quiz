@@ -1,0 +1,12 @@
+{
+  "name": "quizzer-local",
+  "owner": { "name": "mouka" },
+  "description": "Local marketplace for the quizzer plugin.",
+  "plugins": [
+    {
+      "name": "quizzer",
+      "source": "./",
+      "description": "Format and generate quiz docs."
+    }
+  ]
+}

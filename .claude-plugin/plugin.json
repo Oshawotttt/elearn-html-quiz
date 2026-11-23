@@ -1,0 +1,6 @@
+{
+  "name": "quizzer",
+  "version": "0.1.0",
+  "description": "Format quiz screenshots/text into question and answer docs, and generate practice quizzes from examples and course content.",
+  "author": { "name": "mouka" }
+}
