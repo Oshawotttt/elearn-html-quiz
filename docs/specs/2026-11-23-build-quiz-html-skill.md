@@ -143,9 +143,11 @@ Starting branch: `main`
   - Telegram IP warning (user: "they open the file from tele, then it showed before it opened"): Telegram Desktop shows this for every `.html` file before opening, whatever its content. The page makes no network requests, so opening it does not reveal the IP. README says: safe to proceed; tick "don't ask again"; or send the file zipped.
   - Non-transient out-of-scope items above.
 - **Acceptance criteria:**
-  - [ ] `grep '"version": "0.2.0"' .claude-plugin/plugin.json` matches.
-  - [ ] README covers all three skills, `questions-format.md`, the filename rule, storage/autosave per browser, no network requests, the Telegram note, and the out-of-scope items (read).
+  - [x] `grep '"version": "0.2.0"' .claude-plugin/plugin.json` matches.
+  - [x] README covers all three skills, `questions-format.md`, the filename rule, storage/autosave per browser, no network requests, the Telegram note, and the out-of-scope items (read).
 - **Doc deltas:** this subtask is the doc delta.
+  - `plugin.json` description now mentions HTML quiz pages. Why: the plugin gained a third skill.
+  - `marketplace.json` description left as is. Why: not in this subtask's Files.
 
 ## Human checks
 
