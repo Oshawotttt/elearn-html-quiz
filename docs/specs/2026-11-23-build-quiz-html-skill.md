@@ -122,9 +122,14 @@ Starting branch: `main`
   - `disable-model-invocation: true`, same as the other skills (code: `skills/*/SKILL.md`).
   - Created filenames have no spaces (docs: `d:\SMU\quizzer\CLAUDE.md`).
 - **Acceptance criteria:**
-  - [ ] `SKILL.md` frontmatter has `name: build-quiz-html` and `disable-model-invocation: true`; body references `../format-quiz-docs/questions-format.md` and `quiz-template.html` (`grep`).
-  - [ ] Body states the copy-then-Edit steps, the `</script` rule and the no-space filename rule (read).
+  - [x] `SKILL.md` frontmatter has `name: build-quiz-html` and `disable-model-invocation: true`; body references `../format-quiz-docs/questions-format.md` and `quiz-template.html` (`grep`).
+  - [x] Body states the copy-then-Edit steps, the `</script` rule and the no-space filename rule (read).
 - **Doc deltas:** README: skill usage.
+  - Default output folder: the argument, else the input file's folder, else the working folder. Why: the spec names `[output folder]` but no default.
+  - A `.md` input not in `questions-format.md` layout is converted like screenshots, to `<name>-Questions.md`. Why: the page can only parse the format.
+  - The `</script` replacement is case-insensitive. Why: HTML end tags are case-insensitive.
+  - Step 6 self-check: placeholder gone, header count matches, no answer key. Why: catches a partial Edit.
+  - Report tells the user that Chrome/Edge open a Save dialog on the first answer. Why: the dialog would otherwise surprise them.
 
 ### S4 — README and version
 
