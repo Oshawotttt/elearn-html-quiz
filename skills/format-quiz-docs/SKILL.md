@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 Arguments: $ARGUMENTS
 
-1. Read `quiz-rules.md` next to this file. Follow it for arguments, output docs, marks, finding answers and eLearn rules.
+1. Read `quiz-rules.md` and `questions-format.md` next to this file. Follow `quiz-rules.md` for arguments, output docs, file names, marks, finding answers and eLearn rules. Follow `questions-format.md` for the layout of each question.
 2. Collect the source: screenshots or text the user attached or pointed to. If none is given, ask for it.
 3. Extract every question and option exactly as written. Keep the original order. Do not reword.
 4. Work out each answer: from the source (apply the eLearn rules to screenshots), else from course content, else your own.

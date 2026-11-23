@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 Arguments: $ARGUMENTS
 
-1. Read `../format-quiz-docs/quiz-rules.md` (relative to this file). Follow it for arguments, output docs, marks, finding answers and eLearn rules.
+1. Read `../format-quiz-docs/quiz-rules.md` and `../format-quiz-docs/questions-format.md` (relative to this file). Follow `quiz-rules.md` for arguments, output docs, file names, marks, finding answers and eLearn rules. Follow `questions-format.md` for the layout of each question.
 2. Collect inputs: example quizzes (screenshots, text, files) and/or course content. None pointed to: search the working folder for them.
 3. From example quizzes, learn the style: question types (MCQ, multi-select, true/false, short answer), difficulty, wording, option count. Read eLearn screenshots with the eLearn rules so you learn the right answers, not the student's.
 4. Write new questions. Defaults: 20 questions, or match the example quiz length. Use the count or topics in the arguments if given.

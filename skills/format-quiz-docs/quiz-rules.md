@@ -10,13 +10,15 @@ For `.docx`, use the `anthropic-skills:docx` skill.
 
 ## Output: always two docs
 
-Name them `<topic> - Questions` and `<topic> - Answers`. Take `<topic>` from the quiz title, or the source file/folder name.
+Take the quiz title from the source, or the source file/folder name. Name the docs `<name>-Questions` and `<name>-Answers`, where `<name>` is the title made safe for file names (see **File names**).
+
+Write both docs in the format in `questions-format.md` (next to this file): title heading, question headers, stem, options, written questions. In `.docx`, keep the same text and order.
 
 1. **Questions doc**: for attempting the quiz.
    - Questions and options only.
    - No answers, hints, explanations, ticks or highlights. Nothing that gives the answer away.
    - Number every question. Label options a, b, c, d...
-   - Mark multi-select questions "(Select all that apply)". Mark true/false questions as such.
+   - Mark multi-select questions "(Select all that apply)". Give true/false questions the options `a. True` and `b. False`.
    - Leave answer space (blank lines) under short-answer and open questions.
 2. **Answers doc**: for checking answers.
    - Same questions, same numbering and option order.
@@ -26,6 +28,20 @@ Name them `<topic> - Questions` and `<topic> - Answers`. Take `<topic>` from the
      - `(given)`: the quiz showed the answer.
      - `(from course: <file>)`: you found it in the course content.
      - `(own answer)`: general knowledge, not confirmed by course content. Flag these so the user can double-check.
+
+## File names
+
+No spaces in file names. Build `<name>` from the title:
+
+1. Replace each space with `-`.
+2. Drop every character other than letters, digits, `.`, `_` and `-`.
+3. Collapse repeated `-` into one.
+4. Trim `-` from both ends.
+5. Keep the case.
+
+Example: title `Finals Practice Quiz 2 (Short)` gives `Finals-Practice-Quiz-2-Short-Questions.md` and `Finals-Practice-Quiz-2-Short-Answers.md`.
+
+The rule applies to `.md` and `.docx` files. The title inside the doc keeps its spaces.
 
 ## Marks
 
