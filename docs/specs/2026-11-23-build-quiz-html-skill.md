@@ -89,12 +89,22 @@ Starting branch: `main`
   - Attempt `.md` content keeps the example's layout (header, marker instructions, every question with options and the student's answer); course-specific marker wording comes from the quiz intro, not hard-coded CS205 text.
   - `</script` inside question text must not end the script block: the skill writes it as `<\/script` (S3), and the page reads it back as `</script`.
 - **Acceptance criteria:**
-  - [ ] `grep -c "{{QUESTIONS}}" skills/build-quiz-html/quiz-template.html` prints `1`; `grep -o "{{[A-Z_]*}}"` finds no other placeholder.
-  - [ ] `grep -nE "(src|href)=\"(https?:)?//|url\((https?:)?//|fetch\(|import\(" skills/build-quiz-html/quiz-template.html` prints nothing.
-  - [ ] `grep -n "CS205" skills/build-quiz-html/quiz-template.html` prints nothing.
-  - [ ] A `node -e` script that extracts `#quiz-core`, runs it in `node:vm`, and parses the body of `d:\SMU\quizzer\example\Finals Practice Quiz 2 (Short) - Questions.md` reports 17 questions, Q3 type `multi`, Q16 type `written`; `safeName('Finals Practice Quiz 2 (Short)')` returns `Finals-Practice-Quiz-2-Short`; `renderMarkdown('<img src=x onerror=1>')` output has no `<img`.
-  - [ ] Template calls `showSaveFilePicker` with `suggestedName` from `safeName(...) + '-attempt.md'` and writes with `createWritable()`, `write()`, `close()` (read).
+  - [x] `grep -c "{{QUESTIONS}}" skills/build-quiz-html/quiz-template.html` prints `1`; `grep -o "{{[A-Z_]*}}"` finds no other placeholder.
+  - [x] `grep -nE "(src|href)=\"(https?:)?//|url\((https?:)?//|fetch\(|import\(" skills/build-quiz-html/quiz-template.html` prints nothing.
+  - [x] `grep -n "CS205" skills/build-quiz-html/quiz-template.html` prints nothing.
+  - [x] A `node -e` script that extracts `#quiz-core`, runs it in `node:vm`, and parses the body of `d:\SMU\quizzer\example\Finals Practice Quiz 2 (Short) - Questions.md` reports 17 questions, Q3 type `multi`, Q16 type `written`; `safeName('Finals Practice Quiz 2 (Short)')` returns `Finals-Practice-Quiz-2-Short`; `renderMarkdown('<img src=x onerror=1>')` output has no `<img`.
+  - [x] Template calls `showSaveFilePicker` with `suggestedName` from `safeName(...) + '-attempt.md'` and writes with `createWritable()`, `write()`, `close()` (read).
 - **Doc deltas:** README: storage and autosave per browser; "page makes no network requests".
+  - `parseBank(md)` returns `{ title, intro, questions }`; each question is `{ n, points, type, stem, opts, wordLimit }` with `type` one of `single`, `multi`, `written` and `points` `null` when the header has none. Why: one object feeds the page, the attempt file and the verifier.
+  - `safeName` keeps Unicode letters and digits (`\p{L}\p{N}`), turns any whitespace into `-`, and falls back to `quiz` when nothing is left. Why: the S1 rule says "letters" without limiting to ASCII, and an empty name would give `-attempt.md`.
+  - Storage key `quizzer:<safeName>`, IndexedDB database `quizzer-autosave:<safeName>`. Why: per-quiz state, as the storage-key decision requires.
+  - `&nbsp;` lines are dropped from intro and stems; `**Word limit**` is read anywhere in a written question outside code fences; option lines inside code fences stay in the stem. Why: `questions-format.md` puts `&nbsp;` answer space after the word limit.
+  - Export filename is `<safeName>-attempt-YYYY-MM-DD-HHMM.md`. Why: each export is a separate download and must not clash with the autosave file `<safeName>-attempt.md`.
+  - Autosave: if the student cancels the Save dialog, it is not shown again on that page visit; "Set autosave file" stays available. After a reload, the first answer (or "Resume autosave") asks for permission. Firefox/Safari hide the autosave button and show "Autosave needs Chrome or Edge". Why: no repeated dialogs while answering.
+  - The quiz intro is shown above the questions and copied into the attempt under "Quiz instructions"; marker steps are listed only for question types present; total marks and a per-range breakdown are computed when every question has points. Why: replaces the example's hard-coded CS205 marker text.
+  - The written-answer code fence is longer than any backtick run in the answer (min 4). Why: an answer containing ```` would otherwise break the attempt file.
+  - `renderMarkdown` also handles `#` headings, `*` bullets and `1)` lists, and escapes all HTML (including `'`). An empty or unparsable bank shows "No questions found". Why: robustness for converted input.
+  - Known limit, needs no doc: a bank containing `<!--` followed by `<script` could still confuse the HTML parser; only `</script` is escaped, as the spec decides.
 
 ### S3 — `/build-quiz-html` skill
 
