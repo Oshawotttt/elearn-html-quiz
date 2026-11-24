@@ -2,6 +2,32 @@
 
 Claude Code plugin `quizzer`. It turns quizzes into practice material: formatted question and answer docs, generated practice quizzes, and a single-file HTML quiz page that students can attempt offline.
 
+## Installation
+
+In Claude Code, run:
+
+```
+/plugin install create-quiz --marketplace Oshawotttt/elearn-html-quiz
+```
+
+This adds the marketplace if it is not added yet, then installs the plugin.
+
+Or add the marketplace and install in two steps:
+
+```
+/plugin marketplace add Oshawotttt/elearn-html-quiz
+/plugin install create-quiz@create-quiz
+```
+
+From a local clone, pass the folder path instead:
+
+```
+/plugin marketplace add ./elearn-html-quiz
+/plugin install create-quiz@create-quiz
+```
+
+Restart Claude Code if the commands do not show up. To update later, run `/plugin marketplace update create-quiz`.
+
 ## Skills
 
 Each skill runs only when you type its command.
