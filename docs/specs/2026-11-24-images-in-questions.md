@@ -115,14 +115,17 @@ Starting branch: `main`
   - The attempt file keeps the original `![alt](path)` text.
   - The page still makes no network requests.
 - **Acceptance criteria:**
-  - [ ] `grep -o "{{[A-Z_]*}}" skills/build-quiz-html/quiz-template.html` prints only `{{QUESTIONS}}`, once.
-  - [ ] `node -e` vm script: `renderMarkdown('![Graph](images/a.png)')` contains `<img` with `src="images/a.png"` and `alt="Graph"`.
-  - [ ] Same script: each of `![x](https://e.com/a.png)`, `![x](//e.com/a.png)`, `![x](../a.png)`, `![x](images/a.svg)`, `![x](javascript:alert(1))` renders with no `<img`.
-  - [ ] Same script: `renderMarkdown('![x" onerror="1](images/a.png)')` output has no `onerror=` attribute (the `"` is escaped).
-  - [ ] Same script: `parseBank` on a bank with `- a. ![A](images/q1-a.png)` keeps it as option `a`; `renderInline` of its text gives an `<img`.
-  - [ ] Same script: `buildAttempt` output for a stem with an image line contains `![` and `images/`.
-  - [ ] Existing checks from the previous spec still pass: 17 questions from the example Questions.md, Q3 `multi`, Q16 `written`; `renderMarkdown('<img src=x onerror=1>')` has no `<img`; no `(src|href)="(https?:)?//`, `fetch(` or `import(` in the template.
+  - [x] `grep -o "{{[A-Z_]*}}" skills/build-quiz-html/quiz-template.html` prints only `{{QUESTIONS}}`, once.
+  - [x] `node -e` vm script: `renderMarkdown('![Graph](images/a.png)')` contains `<img` with `src="images/a.png"` and `alt="Graph"`.
+  - [x] Same script: each of `![x](https://e.com/a.png)`, `![x](//e.com/a.png)`, `![x](../a.png)`, `![x](images/a.svg)`, `![x](javascript:alert(1))` renders with no `<img`.
+  - [x] Same script: `renderMarkdown('![x" onerror="1](images/a.png)')` output has no `onerror=` attribute (the `"` is escaped).
+  - [x] Same script: `parseBank` on a bank with `- a. ![A](images/q1-a.png)` keeps it as option `a`; `renderInline` of its text gives an `<img`.
+  - [x] Same script: `buildAttempt` output for a stem with an image line contains `![` and `images/`.
+  - [x] Existing checks from the previous spec still pass: 17 questions from the example Questions.md, Q3 `multi`, Q16 `written`; `renderMarkdown('<img src=x onerror=1>')` has no `<img`; no `(src|href)="(https?:)?//`, `fetch(` or `import(` in the template.
 - **Doc deltas:** README: page shows images from the `images/` folder beside it; still no network requests. `questions-format.md` covers the syntax (S1).
+  - Broken images are swapped for an "Image missing: <alt> (<path>)" note by one capturing `error` listener on `document`, not an `onerror` attribute. Why: keeps every `<img>` free of inline handlers; README line covers the behaviour.
+  - Bold/italic are applied to the text between images only, never across an image. Why: keeps `_` and `*` in alt text and file names from turning into `<em>` inside attributes; no doc needed.
+  - Images get a white background behind them. Why: transparent PNG figures stay readable in dark mode; no doc needed.
 
 ### S3 — `/build-quiz-html` outputs a folder when the quiz has images
 
