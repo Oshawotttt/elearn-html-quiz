@@ -1,0 +1,6 @@
+{
+  "name": "create-quiz",
+  "version": "0.2.0",
+  "description": "Format quiz screenshots/text into question and answer docs, generate practice quizzes from examples and course content, and build single-file HTML quiz pages.",
+  "author": { "name": "Oshawotttt" }
+}

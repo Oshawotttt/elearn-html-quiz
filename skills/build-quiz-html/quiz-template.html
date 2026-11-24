@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz</title>
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#1d1d1b; --muted:#6b6a65; --line:#e2e0d8;
+  --accent:#2f5fd0; --accent-soft:#e7eefc; --flag:#c7701a; --flag-soft:#fbefe2;
+  --ok:#2e7d4f; --warn:#b3261e; --code:#f1efe9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151515; --card:#1f1f1f; --ink:#ecebe7; --muted:#a19f98; --line:#33322f;
+    --accent:#7ea2ff; --accent-soft:#232c42; --flag:#f0a25a; --flag-soft:#3a2a1b;
+    --ok:#6fcf97; --warn:#ff8a80; --code:#2a2a28;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;flex:1 1 auto}
+.stat{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:4px;background:var(--line);position:sticky;top:0}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.layout{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;max-width:1100px;margin:0 auto;padding:20px 16px 80px}
+nav{position:sticky;top:70px;align-self:start;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+nav a{display:flex;align-items:center;justify-content:center;height:32px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;font-size:13px;font-variant-numeric:tabular-nums}
+nav a.done{background:var(--accent-soft);border-color:var(--accent)}
+nav a.flag{box-shadow:inset 0 -3px 0 var(--flag)}
+.legend{grid-column:1/-1;font-size:12px;color:var(--muted);margin-top:6px}
+.intro{color:var(--muted);margin:0 0 18px}
+.intro p{margin:.4em 0}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:18px;scroll-margin-top:80px}
+.q.flagged{border-color:var(--flag)}
+.qhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.qhead b{font-size:15px}
+.tag{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.tag.multi{background:var(--flag-soft);color:var(--flag)}
+.qhead .sp{flex:1}
+.flagbtn{font-size:12px;padding:3px 9px}
+.q.flagged .flagbtn{background:var(--flag-soft);border-color:var(--flag);color:var(--flag)}
+.stem p{margin:.5em 0}
+.stem ul,.stem ol{margin:.4em 0;padding-left:1.4em}
+.stem h3,.stem h4{margin:.8em 0 .3em;font-size:15px}
+pre{background:var(--code);border-radius:8px;padding:10px 12px;overflow-x:auto;font-size:13.5px;line-height:1.45}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.92em}
+p code,li code,td code,.opt code{background:var(--code);padding:1px 4px;border-radius:4px}
+table{border-collapse:collapse;margin:.6em 0;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:5px 10px;text-align:left}
+th{background:var(--code)}
+.stem{overflow-x:auto}
+.opts{display:grid;gap:8px;margin-top:10px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.sel{background:var(--accent-soft);border-color:var(--accent)}
+.opt input{margin-top:4px;flex:none}
+.opt .l{font-weight:600;flex:none}
+textarea{width:100%;min-height:220px;margin-top:10px;font:inherit;font-size:15px;line-height:1.5;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.wc{font-size:13px;color:var(--muted);text-align:right;margin-top:4px}
+.wc.over{color:var(--warn);font-weight:600}
+.clear{font-size:12px;padding:3px 9px;margin-top:8px}
+.empty{background:var(--card);border:1px solid var(--warn);border-radius:12px;padding:18px 20px;color:var(--warn)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+@media (max-width:760px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  nav{position:static;grid-template-columns:repeat(auto-fill,minmax(34px,1fr))}
+  .q{padding:14px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Quiz</h1>
+  <span class="stat" id="prog"></span>
+  <span class="stat" id="timer"></span>
+  <span class="stat" id="saveStat"></span>
+  <button id="btnLink">Set autosave file</button>
+  <button id="btnReset">Reset</button>
+  <button id="btnCopy">Copy Markdown</button>
+  <button id="btnExport" class="primary">Export attempt (.md)</button>
+</header>
+<div class="bar"><i id="barfill"></i></div>
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="quiz"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Question bank: a whole Questions.md, in the format of skills/format-quiz-docs/questions-format.md. Write every "</script" in it as "<\/script". -->
+<script type="text/markdown" id="qsrc">
+{{QUESTIONS}}
+</script>
+
+<!-- Pure functions, no DOM access: parseBank, renderMarkdown, safeName, buildAttempt. -->
+<script id="quiz-core">
+/* ---------- helpers ---------- */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function countWords(s){ return (String(s || '').trim().match(/\S+/g) || []).length; }
+function isSpacerLine(l){ return /^\s*(&nbsp;| )\s*$/.test(l); }
+function formatDuration(ms){
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return `${Math.floor(s / 3600)}h ${String(Math.floor(s / 60) % 60).padStart(2, '0')}m ${String(s % 60).padStart(2, '0')}s`;
+}
+
+/* ---------- file names: spaces become "-", keep letters, digits, ".", "_", "-" ---------- */
+function safeName(title){
+  const name = String(title || '')
+    .replace(/\s/g, '-')
+    .replace(/[^\p{L}\p{N}._-]/gu, '')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return name || 'quiz';
+}
+
+/* ---------- parse a Questions.md ---------- */
+function parseBank(md){
+  const src = String(md || '').replace(/\r\n?/g, '\n');
+  const titleMatch = src.match(/^#[ \t]+(.+?)[ \t]*$/m);
+  const title = titleMatch ? titleMatch[1].replace(/\s+-\s+Questions$/i, '').trim() : 'Quiz';
+
+  const headRe = /^\*\*Question (\d+)\*\*(.*)$/gm;
+  const heads = [...src.matchAll(headRe)];
+
+  const introStart = titleMatch ? titleMatch.index + titleMatch[0].length : 0;
+  const introEnd = heads.length ? heads[0].index : src.length;
+  const intro = cleanBlock(src.slice(introStart, introEnd));
+
+  const questions = heads.map((h, k) => {
+    const end = k + 1 < heads.length ? heads[k + 1].index : src.length;
+    const lines = src.slice(h.index + h[0].length, end).split('\n');
+    const opts = [], stem = [];
+    let wordLimit = null, inFence = false;
+    for (const line of lines){
+      if (/^\s*```/.test(line)) inFence = !inFence;
+      const opt = !inFence && line.match(/^- ([a-e])\. (.*)$/);
+      const wl = !inFence && line.match(/^\*\*Word limit\*\*:\s*Maximum (\d+) words?\.?\s*$/i);
+      if (opt) opts.push({ letter: opt[1], text: opt[2].trim() });
+      else if (wl) wordLimit = +wl[1];
+      else stem.push(line);
+    }
+    const marks = h[2];
+    const pts = marks.match(/\((\d+(?:\.\d+)?) points?\)/i);
+    const multi = /\(Select all that apply\)/i.test(marks);
+    const type = opts.length ? (multi ? 'multi' : 'single') : 'written';
+    return {
+      n: +h[1],
+      points: pts ? +pts[1] : null,
+      type,
+      stem: cleanBlock(stem.join('\n')),
+      opts,
+      wordLimit: type === 'written' ? (wordLimit || 250) : null
+    };
+  });
+  return { title, intro, questions };
+}
+function cleanBlock(text){
+  return text.split('\n').filter(l => !isSpacerLine(l)).join('\n').trim();
+}
+
+/* ---------- small markdown renderer: escapes all HTML first ---------- */
+function renderInline(s){
+  return String(s).split(/(`[^`]*`)/).map(part => {
+    if (/^`[^`]*`$/.test(part)) return '<code>' + escapeHtml(part.slice(1, -1)) + '</code>';
+    return escapeHtml(part)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g, '$1<em>$2</em>')
+      .replace(/(^|[^\w])_([^_\s][^_]*?)_(?!\w)/g, '$1<em>$2</em>');
+  }).join('');
+}
+function renderMarkdown(md){
+  const L = String(md || '').replace(/\r\n?/g, '\n').split('\n'), out = [];
+  const isBullet = l => /^\s*[-*] /.test(l);
+  const isNumbered = l => /^\s*\d+[.)] /.test(l);
+  const isBlockStart = l => /^\s*```/.test(l) || /^#{1,6} /.test(l) || l.startsWith('|') || isBullet(l) || isNumbered(l);
+  let i = 0;
+  while (i < L.length){
+    const l = L[i];
+    if (/^\s*```/.test(l)){
+      const buf = []; i++;
+      while (i < L.length && !/^\s*```/.test(L[i])) buf.push(L[i++]);
+      i++;
+      out.push('<pre><code>' + escapeHtml(buf.join('\n')) + '</code></pre>');
+    } else if (/^#{1,6} /.test(l)){
+      const level = Math.min(6, l.match(/^#+/)[0].length + 2);
+      out.push(`<h${level}>` + renderInline(l.replace(/^#+ /, '')) + `</h${level}>`);
+      i++;
+    } else if (l.startsWith('|')){
+      const rows = [];
+      while (i < L.length && L[i].startsWith('|')) rows.push(L[i++]);
+      const cells = r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+      const body = rows.filter(r => !/^\|[\s:|-]+\|\s*$/.test(r));
+      const [head, ...rest] = body;
+      out.push('<table><thead><tr>' + cells(head || '').map(c => '<th>' + renderInline(c) + '</th>').join('') + '</tr></thead><tbody>' +
+        rest.map(r => '<tr>' + cells(r).map(c => '<td>' + renderInline(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table>');
+    } else if (isBullet(l)){
+      const items = [];
+      while (i < L.length && isBullet(L[i])) items.push(L[i++].replace(/^\s*[-*] /, ''));
+      out.push('<ul>' + items.map(t => '<li>' + renderInline(t) + '</li>').join('') + '</ul>');
+    } else if (isNumbered(l)){
+      const start = parseInt(l, 10);
+      const items = [];
+      while (i < L.length && isNumbered(L[i])) items.push(L[i++].replace(/^\s*\d+[.)] /, ''));
+      out.push(`<ol${start !== 1 ? ` start="${start}"` : ''}>` + items.map(t => '<li>' + renderInline(t) + '</li>').join('') + '</ol>');
+    } else if (!l.trim() || isSpacerLine(l)){
+      i++;
+    } else {
+      const buf = [];
+      while (i < L.length && L[i].trim() && !isSpacerLine(L[i]) && !isBlockStart(L[i])) buf.push(L[i++]);
+      out.push('<p>' + renderInline(buf.join(' ')) + '</p>');
+    }
+  }
+  return out.join('');
+}
+
+/* ---------- attempt file for the marker ---------- */
+function isAnswered(q, answers){
+  const a = (answers || {})[q.n];
+  if (q.type === 'written') return !!(a && String(a).trim());
+  if (q.type === 'multi') return Array.isArray(a) && a.length > 0;
+  return !!a;
+}
+function typeLabel(q){
+  if (q.type === 'multi') return 'Select all that apply';
+  if (q.type === 'single') return 'Choose one';
+  return `Written answer, about ${q.wordLimit} words`;
+}
+function pointsLabel(p){ return p === 1 ? '1 point' : `${p} points`; }
+function marksBreakdown(questions){
+  const groups = [];
+  for (const q of questions){
+    const g = groups[groups.length - 1];
+    if (g && g.points === q.points && g.last === q.n - 1){ g.last = q.n; g.count++; }
+    else groups.push({ first: q.n, last: q.n, points: q.points, count: 1 });
+  }
+  return groups.map(g => {
+    const range = g.first === g.last ? `Q${g.first}` : `Q${g.first}-${g.last}`;
+    return g.count === 1 ? `${range}: ${pointsLabel(g.points)}` : `${range}: ${pointsLabel(g.points)} each = ${g.points * g.count}`;
+  }).join('; ');
+}
+function fenceFor(text){
+  const runs = String(text).match(/`+/g) || [];
+  const longest = runs.reduce((m, r) => Math.max(m, r.length), 0);
+  return '`'.repeat(Math.max(4, longest + 1));
+}
+function buildAttempt(quiz, state){
+  const Q = quiz.questions, answers = state.answers || {}, flags = state.flags || {};
+  const now = new Date(state.now || Date.now());
+  const started = state.started != null ? state.started : now.getTime();
+  const answered = Q.filter(q => isAnswered(q, answers)).length;
+  const flagged = Q.filter(q => flags[q.n]).map(q => q.n);
+  const scored = Q.every(q => q.points != null);
+  const types = new Set(Q.map(q => q.type));
+  const out = [];
+
+  out.push(`# ${quiz.title} - Student Attempt`, '');
+  out.push(`- Exported: ${now.toLocaleString()}`);
+  out.push(`- Started: ${new Date(started).toLocaleString()} (elapsed ${formatDuration(now.getTime() - started)})`);
+  out.push(`- Answered: ${answered}/${Q.length}`);
+  out.push(`- Flagged by student as unsure: ${flagged.length ? flagged.join(', ') : 'none'}`);
+  if (scored && Q.length) out.push(`- Total marks available: ${Q.reduce((s, q) => s + q.points, 0)} (${marksBreakdown(Q)})`);
+  out.push('');
+
+  if (quiz.intro){
+    out.push('## Quiz instructions', '', quiz.intro, '');
+  }
+
+  const steps = [];
+  steps.push('For each question, work out the correct answer yourself from the course content this quiz covers (see the quiz title' + (quiz.intro ? ' and the quiz instructions above' : '') + '), or use a separately generated answer key.');
+  if (types.has('single')) steps.push('**Choose one** questions: full marks for the correct letter, 0 otherwise.');
+  if (types.has('multi')) steps.push('**Select all that apply** questions: the student\'s exact set of ticked letters is given. Report both all-or-nothing marks and partial credit (+ per correct option ticked, - per wrong option ticked, floor 0), since the official scheme is unknown.');
+  if (types.has('written')) steps.push('**Written** questions: the answer is copied verbatim in a text block. If the question has sub-parts (a), (b), ..., split its marks across them sensibly, mark each part against what it asks for, give a score with a short justification, and note anything missing or wrong. For calculation parts, show the correct working. The word count is given; the word limit is a guide, not a hard limit.');
+  steps.push('Finish with a per-question score table, total score, and the topics to revise.');
+
+  out.push('## Instructions for the marker', '');
+  out.push('This file contains every question in full, all answer options, and the student\'s responses. **No answer key is included.**', '');
+  steps.forEach((s, k) => out.push(`${k + 1}. ${s}`));
+  out.push('', '---', '');
+
+  for (const q of Q){
+    const pts = q.points != null ? ` (${pointsLabel(q.points)})` : '';
+    out.push(`## Question ${q.n}${pts} - ${typeLabel(q)}${flags[q.n] ? ' - FLAGGED (student unsure)' : ''}`, '');
+    if (q.stem) out.push(q.stem, '');
+    const a = answers[q.n];
+    if (q.type === 'written'){
+      const txt = String(a || '').trim();
+      if (!txt) out.push('**Student answer:** _(no answer)_', '');
+      else {
+        const n = countWords(txt), fence = fenceFor(txt);
+        out.push(`**Student answer** (${n} words${n > q.wordLimit ? ', over the ' + q.wordLimit + '-word limit' : ''}):`, '');
+        out.push(fence + 'text', txt, fence, '');
+      }
+    } else {
+      out.push('**Options:**', '');
+      q.opts.forEach(o => out.push(`- ${o.letter}. ${o.text}`));
+      out.push('');
+      const sel = q.type === 'multi' ? (Array.isArray(a) ? a.slice().sort() : []) : (a ? [a] : []);
+      if (!sel.length) out.push('**Student answer:** _(no answer)_', '');
+      else {
+        out.push(`**Student answer:** ${sel.join(', ')}`, '');
+        sel.forEach(l => { const o = q.opts.find(x => x.letter === l); out.push(`- (selected) ${l}. ${o ? o.text : ''}`); });
+        if (q.type === 'multi'){
+          const not = q.opts.filter(o => !sel.includes(o.letter)).map(o => o.letter);
+          out.push(`- Not selected: ${not.length ? not.join(', ') : 'none'}`);
+        }
+        out.push('');
+      }
+    }
+    out.push('---', '');
+  }
+  return out.join('\n');
+}
+</script>
+
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+
+/* ---------- load the question bank ---------- */
+const raw = $('#qsrc').textContent.replace(/<\\\/script/gi, '</script');
+const quiz = parseBank(raw);
+const Q = quiz.questions;
+const NAME = safeName(quiz.title);
+const STORE = 'quizzer:' + NAME;
+const IDB_NAME = 'quizzer-autosave:' + NAME;
+
+document.title = quiz.title;
+$('#title').textContent = quiz.title;
+
+/* ---------- state: localStorage, one key per quiz ---------- */
+let state = { answers: {}, flags: {}, started: Date.now() };
+try { const s = JSON.parse(localStorage.getItem(STORE)); if (s && s.answers) state = s; } catch(e){}
+const attemptText = () => buildAttempt(quiz, { ...state, now: Date.now() });
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e){} scheduleFileSave(); };
+
+/* ---------- autosave to <name>-attempt.md (File System Access API, Chrome/Edge) ---------- */
+const FS_OK = 'showSaveFilePicker' in window;
+let fileHandle = null, fileReady = false, saveTimer = null, autosaveAsked = false;
+function idb(mode, fn){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(IDB_NAME, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onsuccess = () => { const tx = r.result.transaction('kv', mode); const req = fn(tx.objectStore('kv')); tx.oncomplete = () => res(req && req.result); tx.onerror = () => rej(tx.error); };
+    r.onerror = () => rej(r.error);
+  });
+}
+function setSaveStat(t){ $('#saveStat').textContent = t; }
+function scheduleFileSave(){
+  if (!fileReady) return;
+  clearTimeout(saveTimer);
+  setSaveStat('Saving…');
+  saveTimer = setTimeout(writeFile, 600);
+}
+async function writeFile(){
+  if (!fileReady) return;
+  try {
+    const w = await fileHandle.createWritable();
+    await w.write(attemptText());
+    await w.close();
+    setSaveStat(`Autosaved to ${fileHandle.name} ${new Date().toLocaleTimeString()}`);
+  } catch(e){
+    fileReady = false;
+    setSaveStat('Autosave paused');
+    $('#btnLink').textContent = 'Resume autosave';
+  }
+}
+async function pickFile(){
+  try {
+    fileHandle = await window.showSaveFilePicker({
+      suggestedName: safeName(quiz.title) + '-attempt.md',
+      types: [{ description: 'Markdown', accept: { 'text/markdown': ['.md'] } }]
+    });
+    try { await idb('readwrite', s => s.put(fileHandle, 'handle')); } catch(e){}
+    fileReady = true; afterLink();
+  } catch(e){
+    if (e.name !== 'AbortError') toast('Could not open file: ' + e.message);
+    else if (!fileReady) setSaveStat('Autosave off');
+  }
+}
+async function resumeFile(){
+  try {
+    if (await fileHandle.requestPermission({ mode: 'readwrite' }) === 'granted'){ fileReady = true; afterLink(); return true; }
+  } catch(e){}
+  return false;
+}
+function afterLink(){
+  $('#btnLink').textContent = 'Change autosave file';
+  writeFile();
+}
+/* Button: resume the stored file if paused, else pick a (new) file. */
+async function linkFile(){
+  if (!FS_OK){ toast('Autosave needs Chrome or Edge. Use Export instead.'); return; }
+  autosaveAsked = true;
+  if (fileHandle && !fileReady && await resumeFile()) return;
+  await pickFile();
+}
+/* First answer of the page visit: open the Save dialog, or ask to resume the stored file. */
+async function autosaveOnFirstAnswer(){
+  if (!FS_OK || fileReady || autosaveAsked) return;
+  autosaveAsked = true;
+  await restoring;
+  if (fileReady) return;
+  if (fileHandle){ await resumeFile(); return; }
+  await pickFile();
+}
+async function restoreHandle(){
+  if (!FS_OK){ setSaveStat('Autosave needs Chrome or Edge'); $('#btnLink').hidden = true; return; }
+  try {
+    const h = await idb('readonly', s => s.get('handle'));
+    if (!h){ setSaveStat('Autosave starts on your first answer'); return; }
+    fileHandle = h;
+    if (await h.queryPermission({ mode: 'readwrite' }) === 'granted'){ fileReady = true; afterLink(); }
+    else { setSaveStat(`Autosave paused (${h.name}): answer or click Resume`); $('#btnLink').textContent = 'Resume autosave'; }
+  } catch(e){ setSaveStat('Autosave off'); }
+}
+
+/* ---------- render ---------- */
+function onAnswer(){ autosaveOnFirstAnswer(); save(); refresh(); }
+
+function render(){
+  const main = $('#quiz'), nav = $('#nav');
+  main.innerHTML = ''; nav.innerHTML = '';
+  if (!Q.length){
+    main.innerHTML = '<div class="empty">No questions found. The question bank must follow questions-format.md.</div>';
+    return;
+  }
+  if (quiz.intro){
+    const intro = document.createElement('div'); intro.className = 'intro';
+    intro.innerHTML = renderMarkdown(quiz.intro);
+    main.appendChild(intro);
+  }
+  for (const q of Q){
+    const a = document.createElement('a');
+    a.href = '#q' + q.n; a.textContent = q.n; a.id = 'nav' + q.n;
+    nav.appendChild(a);
+
+    const sec = document.createElement('section');
+    sec.className = 'q'; sec.id = 'q' + q.n;
+    const label = q.type === 'multi' ? '<span class="tag multi">Select all that apply</span>'
+                : q.type === 'single' ? '<span class="tag">Choose one</span>'
+                : `<span class="tag">Written · about ${q.wordLimit} words</span>`;
+    const pts = q.points != null ? `<span class="stat">${q.points} ${q.points === 1 ? 'pt' : 'pts'}</span>` : '';
+    sec.innerHTML = `<div class="qhead"><b>Question ${q.n}</b>${pts}${label}<span class="sp"></span><button class="flagbtn">⚑ Flag</button></div><div class="stem">${renderMarkdown(q.stem)}</div>`;
+
+    if (q.type === 'written'){
+      const ta = document.createElement('textarea');
+      ta.placeholder = 'Type your answer…';
+      ta.value = state.answers[q.n] || '';
+      const wc = document.createElement('div'); wc.className = 'wc';
+      const upd = () => {
+        const n = countWords(ta.value);
+        wc.textContent = `${n} / ${q.wordLimit} words` + (n > q.wordLimit ? ' — over limit' : '');
+        wc.classList.toggle('over', n > q.wordLimit);
+      };
+      ta.addEventListener('input', () => { state.answers[q.n] = ta.value; upd(); onAnswer(); });
+      upd();
+      sec.append(ta, wc);
+    } else {
+      const box = document.createElement('div'); box.className = 'opts';
+      for (const o of q.opts){
+        const lab = document.createElement('label'); lab.className = 'opt';
+        const inp = document.createElement('input');
+        inp.type = q.type === 'multi' ? 'checkbox' : 'radio';
+        inp.name = 'q' + q.n; inp.value = o.letter;
+        const cur = state.answers[q.n];
+        inp.checked = q.type === 'multi' ? (cur || []).includes(o.letter) : cur === o.letter;
+        inp.addEventListener('change', () => {
+          if (q.type === 'multi') state.answers[q.n] = [...box.querySelectorAll('input:checked')].map(x => x.value);
+          else state.answers[q.n] = o.letter;
+          box.querySelectorAll('.opt').forEach(x => x.classList.toggle('sel', x.querySelector('input').checked));
+          onAnswer();
+        });
+        lab.innerHTML = `<span class="l">${o.letter}.</span><span>${renderInline(o.text)}</span>`;
+        lab.prepend(inp);
+        lab.classList.toggle('sel', inp.checked);
+        box.appendChild(lab);
+      }
+      const clr = document.createElement('button'); clr.className = 'clear'; clr.textContent = 'Clear choice';
+      clr.addEventListener('click', () => {
+        delete state.answers[q.n];
+        box.querySelectorAll('input').forEach(x => x.checked = false);
+        box.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+        save(); refresh();
+      });
+      sec.append(box, clr);
+    }
+
+    sec.querySelector('.flagbtn').addEventListener('click', () => {
+      state.flags[q.n] = !state.flags[q.n]; save(); refresh();
+    });
+    main.appendChild(sec);
+  }
+  const lg = document.createElement('div'); lg.className = 'legend';
+  lg.textContent = 'Blue = answered · orange underline = flagged';
+  nav.appendChild(lg);
+  refresh();
+}
+
+function refresh(){
+  let done = 0;
+  for (const q of Q){
+    const ans = isAnswered(q, state.answers); if (ans) done++;
+    $('#nav' + q.n).classList.toggle('done', ans);
+    $('#nav' + q.n).classList.toggle('flag', !!state.flags[q.n]);
+    $('#q' + q.n).classList.toggle('flagged', !!state.flags[q.n]);
+  }
+  $('#prog').textContent = `${done}/${Q.length} answered`;
+  $('#barfill').style.width = (Q.length ? 100 * done / Q.length : 0) + '%';
+}
+
+const tick = () => { $('#timer').textContent = '⏱ ' + formatDuration(Date.now() - state.started); };
+tick(); setInterval(tick, 1000);
+
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
+
+/* ---------- buttons ---------- */
+$('#btnExport').addEventListener('click', () => {
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  const name = `${NAME}-attempt-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.md`;
+  const blob = new Blob([attemptText()], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('Saved ' + name);
+});
+$('#btnCopy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(attemptText()); toast('Markdown copied'); }
+  catch(e){ toast('Copy blocked - use Export instead'); }
+});
+$('#btnReset').addEventListener('click', () => {
+  if (!confirm('Clear all answers, flags and the timer?')) return;
+  state = { answers: {}, flags: {}, started: Date.now() }; save(); render(); tick(); window.scrollTo(0, 0);
+});
+$('#btnLink').addEventListener('click', linkFile);
+
+render();
+const restoring = restoreHandle();
+})();
+</script>
+</body>
+</html>

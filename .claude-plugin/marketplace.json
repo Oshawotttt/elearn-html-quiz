@@ -1,0 +1,12 @@
+{
+  "name": "create-quiz",
+  "owner": { "name": "Oshawotttt" },
+  "description": "Local marketplace for the quizzer plugin.",
+  "plugins": [
+    {
+      "name": "create-quiz",
+      "source": "./",
+      "description": "Format and generate quiz docs."
+    }
+  ]
+}
