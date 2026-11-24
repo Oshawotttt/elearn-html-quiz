@@ -57,7 +57,7 @@ Every file and folder you create has no spaces. Build `<name>` from the quiz tit
    - `{{QUESTIONS}}` no longer appears in the `.html`.
    - The number of `**Question N**` headers in the `.html` equals the number in the Questions.md.
    - The `.html` contains no answer key.
-   - Image layout: every `images/...` path in the `.html` exists under `<name>/images/` (`grep -o "images/[A-Za-z0-9._-]*"` on the `.html`, then `ls` each under `<name>/`).
+   - Image layout: every `images/...` path in the `.html` exists under `<name>/images/` (`grep -oiE "images/[A-Za-z0-9._-]+\.(png|jpe?g|gif|webp)"` on the `.html`, then `ls` each under `<name>/`).
 9. **Report:**
    - the `.html` path, the `-Questions.md` path if you wrote one, and the question count
    - image layout: the `<name>/` folder path and the image count. Tell the user to zip and send this whole folder, so the images travel with the page.
