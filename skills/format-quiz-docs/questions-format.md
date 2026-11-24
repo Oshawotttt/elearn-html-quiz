@@ -98,6 +98,55 @@ Explain why chained allocation performs badly for random access.
 &nbsp;
 ```
 
+## Images
+
+A question may show figures: graphs, diagrams, table images, code images. Each figure is one image line. The image files live in an `images/` folder next to the doc (see **Images** in `quiz-rules.md`).
+
+### Line format
+
+```markdown
+![<alt text>](images/<file>)
+```
+
+- `<alt text>`: a short description of the figure, e.g. `Line graph of demand over time`. It shows when the image is missing.
+- `<file>`: `<name>-Q<N>.<ext>` for the first image of question N, `<name>-Q<N>-<k>.<ext>` (k = 2, 3, ...) for the next ones. `<name>` is the safe quiz name (see **File names** in `quiz-rules.md`).
+
+### Path rule
+
+- The path always starts with `images/`. It is relative to the doc (`.md`) or the `.html`.
+- No subfolders, no spaces, no `..`, no backslash, no scheme.
+- Allowed extensions: `png`, `jpg`, `jpeg`, `gif`, `webp`.
+- The quiz page accepts exactly the paths that match `^images/[A-Za-z0-9._-]+\.(png|jpe?g|gif|webp)$` (case-insensitive). It shows any other `![...](...)` as plain text.
+- No remote images: never `http://`, `https://` or `//` paths. The quiz page makes no network requests.
+
+### Placement
+
+- In the stem: on its own line, after the stem text and before the options, with a blank line above and below.
+
+```markdown
+**Question 1** (2 points)
+
+Which trend does the graph show?
+
+![Line graph of demand over time](images/Finals-Quiz-Q1.png)
+
+- a. Rising
+- b. Falling
+```
+
+- In an option: the image line is the option text, or part of it.
+
+```markdown
+- a. ![Bar chart A](images/Finals-Quiz-Q2.png)
+- b. ![Bar chart B](images/Finals-Quiz-Q2-2.png)
+```
+
+- Not in the title or question header.
+
+### Answers doc
+
+The Answers doc repeats the same image lines, at the same spots, with the same paths.
+
 ## Spacing
 
 - One blank line between the title, intro, each header, stem block and option list.

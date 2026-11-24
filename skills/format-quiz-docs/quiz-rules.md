@@ -43,6 +43,49 @@ Example: title `Finals Practice Quiz 2 (Short)` gives `Finals-Practice-Quiz-2-Sh
 
 The rule applies to `.md` and `.docx` files. The title inside the doc keeps its spaces.
 
+## Images
+
+Use this section when a question has a figure: a graph, diagram, table image or code image. The image line format and where it goes are in **Images** in `questions-format.md`.
+
+### Folder and names
+
+- Put image files in an `images/` folder next to the docs, e.g. `<output folder>/images/`.
+- Name them `<name>-Q<N>.<ext>` for the first image of question N, then `<name>-Q<N>-2.<ext>`, `<name>-Q<N>-3.<ext>`, ... `<name>` is the safe quiz name (see **File names**). Example: `images/Finals-Practice-Quiz-2-Short-Q4.png`.
+- File names have no spaces. Allowed extensions: `png`, `jpg`, `jpeg`, `gif`, `webp`. Crops are saved as `.png`.
+- Number images in the order they appear in the question: stem first, then options a, b, c, ...
+
+### User-supplied images
+
+The user may supply ready images named `Q<N>.png`, `Q<N>-2.png`, ... Copy each one (shell copy) to `images/<name>-Q<N>.png`, `images/<name>-Q<N>-2.png`, ... keeping its extension. Do not crop them.
+
+### Cropping figures from screenshots
+
+For every other figure, crop it out of the source screenshot yourself. The crop holds only the figure, never the whole screenshot.
+
+1. Get the screenshot's pixel size with Pillow:
+   `python -c "from PIL import Image; print(Image.open(r'<src>').size)"`
+2. View the screenshot. Pick the figure's box as fractions of width and height (`l`, `t`, `r`, `b`). Add a small margin.
+3. Crop with an inline Pillow command; do not write a script file:
+   `python -c "from PIL import Image; im=Image.open(r'<src>'); w,h=im.size; im.crop((int(<l>*w), int(<t>*h), int(<r>*w), int(<b>*h))).save(r'<out>')"`
+4. View the crop. It must hold the whole figure and none of:
+   - question text
+   - option text
+   - ticks, crosses or ticked boxes
+   - highlights
+   - scores or marks
+   - "Correct answer" feedback
+   - anything else that gives the answer away
+
+   Otherwise adjust the box and crop again.
+5. After 3 failed tries: ask the user for that image, naming the question number.
+
+### Images in the docs
+
+- `.md`: add the image line (`![<alt text>](images/<file>)`) where the figure appears, per `questions-format.md`. The doc references the file; it does not embed it.
+- `.docx`: insert the image file from `images/` into the document (`anthropic-skills:docx` skill), at the same spot as the Markdown image line: on its own paragraph in the stem, or inside the option. Scale it to fit the page width. The user does not paste images by hand.
+- Both the Questions doc and the Answers doc show every image.
+- No remote images. Every image is a local file in `images/`.
+
 ## Marks
 
 Include marks only when shown. Missing or partial marks: ignore them. Do not invent marks.
