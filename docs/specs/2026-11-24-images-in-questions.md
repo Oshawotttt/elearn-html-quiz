@@ -165,10 +165,13 @@ Starting branch: `main`
   - `/generate-quiz-docs`: may reuse an image from an example quiz or course content when a new question needs it, copied to `images/` under the new quiz's name. Never invent or draw images.
   - Answers doc repeats each image of the Questions doc.
 - **Acceptance criteria:**
-  - [ ] Both `SKILL.md` files reference the **Images** section of `quiz-rules.md` (`grep -n "Images" skills/format-quiz-docs/SKILL.md skills/generate-quiz-docs/SKILL.md`).
-  - [ ] `format-quiz-docs/SKILL.md` says to crop figures from screenshots and ask only for ones it could not crop, by question number (read).
-  - [ ] `generate-quiz-docs/SKILL.md` says reuse only, never create images (read).
+  - [x] Both `SKILL.md` files reference the **Images** section of `quiz-rules.md` (`grep -n "Images" skills/format-quiz-docs/SKILL.md skills/generate-quiz-docs/SKILL.md`).
+  - [x] `format-quiz-docs/SKILL.md` says to crop figures from screenshots and ask only for ones it could not crop, by question number (read).
+  - [x] `generate-quiz-docs/SKILL.md` says reuse only, never create images (read).
 - **Doc deltas:** README: how to supply images; Claude crops figures from screenshots.
+  - Answers doc marks a correct image option as `- **a.** ![..](images/..) ✔`. Why: "bold plus ✔" had no form for an option that is only an image; recorded in both `SKILL.md` files.
+  - `/generate-quiz-docs` writes a different question when one would need an image that does not exist. Why: follows from reuse-only; recorded in `generate-quiz-docs/SKILL.md`.
+  - Both skills report the `images/` folder and image count; `/format-quiz-docs` also reports the questions whose image it had to ask for. Why: the user must know which files to keep with the docs; no other doc.
 
 ### S5 — README, version, TODO
 
