@@ -183,11 +183,12 @@ Starting branch: `main`
 - **Seams:** none.
 - **Decisions:** none beyond the doc deltas of S1–S4.
 - **Acceptance criteria:**
-  - [ ] `grep '"version": "0.3.0"' .claude-plugin/plugin.json` matches.
-  - [ ] `grep -n "Images in questions" README.md` finds no line under **Out of scope**; README has an images section covering cropping, user-supplied images, the `images/` folder, naming, the HTML folder layout and zipping, and the out-of-scope items above (read).
-  - [ ] README no longer says the page is always one self-contained file without qualifying it for quizzes with images (read).
-  - [ ] `docs/specs/TODO.md` has `- [x] Add support for photos` (`grep`).
+  - [x] `grep '"version": "0.3.0"' .claude-plugin/plugin.json` matches.
+  - [x] `grep -n "Images in questions" README.md` finds no line under **Out of scope**; README has an images section covering cropping, user-supplied images, the `images/` folder, naming, the HTML folder layout and zipping, and the out-of-scope items above (read).
+  - [x] README no longer says the page is always one self-contained file without qualifying it for quizzes with images (read).
+  - [x] `docs/specs/TODO.md` has `- [x] Add support for photos` (`grep`).
 - **Doc deltas:** this subtask is the doc delta.
+  - `plugin.json` description now says "build HTML quiz pages with images" instead of "single-file". Why: the page is no longer always one file; no other doc.
 
 ### S6 — Visual test with an example HTML
 
