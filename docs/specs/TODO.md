@@ -1,1 +1,1 @@
-- [ ] Add support for photos
+- [x] Add support for photos

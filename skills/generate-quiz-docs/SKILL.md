@@ -16,7 +16,8 @@ Arguments: $ARGUMENTS
    - Base every question on course content. Cover the topics evenly.
    - Do not copy example questions word for word. Rephrase or test the same idea in a new way.
    - Multi-select: vary the number of correct options. Make distractors plausible.
-5. Write the Questions doc and the Answers doc. In the Answers doc, cite the course file for each answer, `(from course: <file>)`, or tag `(own answer)`.
+   - Images: reuse only. A new question may use an existing image from an example quiz or the course content (a figure, graph or diagram file, or one cropped from a screenshot per **Images** in `quiz-rules.md`). Copy it to `images/<name>-Q<N>.<ext>` under the new quiz's name, following **Images** in `quiz-rules.md`. Never create, invent or draw an image. If a question would need an image that does not exist, write a different question.
+5. Write the Questions doc and the Answers doc. The Answers doc repeats every image of the Questions doc, at the same spot. To mark a correct option whose text is an image, bold the letter and put ✔ after the image, e.g. `- **a.** ![Bar chart A](images/<name>-Q2.png) ✔`. In the Answers doc, cite the course file for each answer, `(from course: <file>)`, or tag `(own answer)`.
 6. After the docs are created, check the answer key for patterns. Fix any found, in both docs, then check again:
    - Correct-answer letters spread roughly evenly across a, b, c, d. No letter dominates.
    - No runs: the same letter is not correct 3+ times in a row. No repeating sequence (a, b, c, d, a, b...).
@@ -25,4 +26,4 @@ Arguments: $ARGUMENTS
    - The correct option is not usually the longest, most detailed, or the only one with hedging words ("usually", "may").
    - "All of the above" / "None of the above" is not always correct when it appears.
    Fix by shuffling option order or rewording options. Never change which answer is correct.
-7. Report the two file paths, question count, topics covered, and the final answer-letter spread.
+7. Report the two file paths, question count, topics covered, the final answer-letter spread, and the `images/` folder and image count if any.

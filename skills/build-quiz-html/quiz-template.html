@@ -54,6 +54,8 @@ table{border-collapse:collapse;margin:.6em 0;font-size:14.5px}
 th,td{border:1px solid var(--line);padding:5px 10px;text-align:left}
 th{background:var(--code)}
 .stem{overflow-x:auto}
+img.qimg{display:block;max-width:100%;height:auto;margin:.4em 0;border-radius:6px;background:#fff}
+.imgmissing{display:inline-block;margin:.4em 0;padding:6px 10px;border:1px dashed var(--warn);border-radius:6px;color:var(--warn);font-size:14px}
 .opts{display:grid;gap:8px;margin-top:10px}
 .opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
 .opt:hover{border-color:var(--accent)}
@@ -167,13 +169,30 @@ function cleanBlock(text){
 }
 
 /* ---------- small markdown renderer: escapes all HTML first ---------- */
+/* Image lines: only local files in images/ become <img>; any other ![...](...) stays plain text. */
+const IMG_PATH = /^images\/[A-Za-z0-9._-]+\.(png|jpe?g|gif|webp)$/i;
+function renderImage(alt, path){
+  return `<img class="qimg" src="${escapeHtml(path)}" alt="${escapeHtml(alt)}">`;
+}
+function renderText(s){
+  return escapeHtml(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g, '$1<em>$2</em>')
+    .replace(/(^|[^\w])_([^_\s][^_]*?)_(?!\w)/g, '$1<em>$2</em>');
+}
 function renderInline(s){
   return String(s).split(/(`[^`]*`)/).map(part => {
     if (/^`[^`]*`$/.test(part)) return '<code>' + escapeHtml(part.slice(1, -1)) + '</code>';
-    return escapeHtml(part)
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g, '$1<em>$2</em>')
-      .replace(/(^|[^\w])_([^_\s][^_]*?)_(?!\w)/g, '$1<em>$2</em>');
+    /* split keeps the image's whole text, alt and path at k % 4 === 1, 2, 3 */
+    const bits = part.split(/(!\[([^\]]*)\]\(([^)\s]*)\))/);
+    let out = '', text = '';
+    for (let k = 0; k < bits.length; k += 4){
+      text += bits[k];
+      if (k + 1 >= bits.length) break;
+      if (IMG_PATH.test(bits[k + 3])){ out += renderText(text) + renderImage(bits[k + 2], bits[k + 3]); text = ''; }
+      else text += bits[k + 1];
+    }
+    return out + renderText(text);
   }).join('');
 }
 function renderMarkdown(md){
@@ -334,6 +353,15 @@ const IDB_NAME = 'quizzer-autosave:' + NAME;
 
 document.title = quiz.title;
 $('#title').textContent = quiz.title;
+
+/* ---------- missing image file: show its alt text and path instead ---------- */
+document.addEventListener('error', e => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains('qimg')) return;
+  const note = document.createElement('span'); note.className = 'imgmissing';
+  note.textContent = `Image missing: ${img.alt || 'no description'} (${img.getAttribute('src')})`;
+  img.replaceWith(note);
+}, true);
 
 /* ---------- state: localStorage, one key per quiz ---------- */
 let state = { answers: {}, flags: {}, started: Date.now() };

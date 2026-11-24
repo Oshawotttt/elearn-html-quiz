@@ -1,6 +1,6 @@
 # elearn-html-quiz
 
-Claude Code plugin `quizzer`. It turns quizzes into practice material: formatted question and answer docs, generated practice quizzes, and a single-file HTML quiz page that students can attempt offline.
+Claude Code plugin `quizzer`. It turns quizzes into practice material: formatted question and answer docs, generated practice quizzes, and an HTML quiz page that students can attempt offline. The page is a single file, or a folder with the page and its images when the quiz has images.
 
 ## Installation
 
@@ -36,13 +36,13 @@ Each skill runs only when you type its command.
 |---|---|---|
 | `/format-quiz-docs [word\|md] [output path]` | Quiz screenshots (including eLearn quiz reviews) or quiz text | `<name>-Questions` and `<name>-Answers` docs |
 | `/generate-quiz-docs [word\|md] [output path] [count / topics]` | Example quizzes and/or course content | A new practice quiz as `<name>-Questions` and `<name>-Answers` docs |
-| `/build-quiz-html <questions.md \| screenshots \| text> [output folder]` | A Questions.md, screenshots or text | `<name>.html`, plus `<name>-Questions.md` when the input was not already a Questions.md |
+| `/build-quiz-html <questions.md \| screenshots \| text> [output folder]` | A Questions.md, screenshots or text | `<name>.html`, or the folder `<name>/` with `<name>.html` and `images/` when the quiz has images; plus `<name>-Questions.md` when the input was not already a Questions.md |
 
 - Docs default to `.docx`. Pass `md` for Markdown, or both.
 - The Answers doc tags each answer `(given)`, `(from course: <file>)` or `(own answer)`. Check the `(own answer)` ones.
 - `/build-quiz-html` with no file uses the newest `*-Questions.md` in the working folder. The HTML holds the questions only, never the answers.
 
-Typical flow: `/format-quiz-docs md` or `/generate-quiz-docs md`, then `/build-quiz-html <name>-Questions.md`, then send the `.html` to students.
+Typical flow: `/format-quiz-docs md` or `/generate-quiz-docs md`, then `/build-quiz-html <name>-Questions.md`, then send the `.html` to students (or, for a quiz with images, zip and send the `<name>/` folder).
 
 ## Question format
 
@@ -52,6 +52,7 @@ All three skills share one Markdown format for Questions docs: [`skills/format-q
 - Each question starts with `**Question N** (P points)`. `(Select all that apply)` marks multi-select.
 - Options are `- a. text` to `- e. text`. True/false uses `- a. True` and `- b. False`.
 - Written questions have no options. An optional `**Word limit**: Maximum N words.` sets the limit; the default is 250.
+- A figure is an image line, `![<alt text>](images/<file>)`, in the stem or as an option's text (see **Images in questions** below).
 
 The HTML page parses this format when it opens, so a Questions.md written by hand works too.
 
@@ -65,11 +66,30 @@ No file the skills create has spaces. `<name>` comes from the quiz title:
 2. Drop every character other than letters, digits, `.`, `_` and `-`.
 3. Collapse repeated `-`, and trim `-` from both ends. Case is kept.
 
-Example: `Finals Practice Quiz 2 (Short)` gives `Finals-Practice-Quiz-2-Short-Questions.md`, `Finals-Practice-Quiz-2-Short-Answers.md`, `Finals-Practice-Quiz-2-Short.html` and `Finals-Practice-Quiz-2-Short-attempt.md`. The rule applies to `.md`, `.docx` and `.html`.
+Example: `Finals Practice Quiz 2 (Short)` gives `Finals-Practice-Quiz-2-Short-Questions.md`, `Finals-Practice-Quiz-2-Short-Answers.md`, `Finals-Practice-Quiz-2-Short.html` and `Finals-Practice-Quiz-2-Short-attempt.md`. The rule applies to `.md`, `.docx`, `.html` and image files.
+
+## Images in questions
+
+A question can show a figure: a graph, diagram, table image or code image, in the stem or as an option.
+
+- **Supplying images:** give eLearn screenshots and Claude crops each figure out itself. The crop holds only the figure: no question or option text, ticks, crosses, highlights, scores or "Correct answer" feedback. If a crop fails 3 times, Claude asks you for that image by question number. You can also supply ready images named `Q<N>.png`, `Q<N>-2.png`, ...; they are copied, not cropped.
+- **Folder and names:** images go in an `images/` folder next to the docs, named `<name>-Q<N>.png`, then `<name>-Q<N>-2.png`, ... for more images in the same question.
+- **In the docs:** `.md` docs reference the file with an image line, `![<alt text>](images/<file>)`; keep the `images/` folder next to them. `.docx` docs have the images inserted. Both the Questions and the Answers doc show every image.
+- **`/generate-quiz-docs`** only reuses images from example quizzes or course content. It never creates or draws one.
+- **HTML page:** a quiz with images builds to a folder:
+
+  ```
+  <output folder>/<name>/
+    <name>.html
+    images/<name>-Q1.png ...
+  ```
+
+  The page shows each image from the `images/` folder beside it, scaled to fit. Zip the `<name>/` folder and send the zip; students unzip it and open the `.html`. If an image file is missing, the page shows its description and path instead. A quiz with no images is still one `.html` file.
+- Only paths of the form `images/<file>.png|jpg|jpeg|gif|webp` become images. Anything else written as `![...](...)` shows as plain text.
 
 ## The HTML quiz page
 
-One self-contained `.html` file. Students double-click it to open it in a browser. It has a question grid, flags for unsure questions, a timer, a progress bar, a word counter for written answers and dark mode.
+One self-contained `.html` file, or, for a quiz with images, a folder with the `.html` and its `images/` (see **Images in questions**). Students double-click the `.html` to open it in a browser. It has a question grid, flags for unsure questions, a timer, a progress bar, a word counter for written answers and dark mode.
 
 The page is built from [`skills/build-quiz-html/quiz-template.html`](skills/build-quiz-html/quiz-template.html): `/build-quiz-html` copies it and pastes the Questions.md into its one placeholder, `{{QUESTIONS}}`.
 
@@ -89,7 +109,7 @@ The attempt file lists every question, its options and the student's answers, pl
 
 ### No network requests
 
-The page loads nothing from the internet: no CDN, web fonts, analytics, remote images or remote saving. Everything it needs is inside the file, and it works offline.
+The page loads nothing from the internet: no CDN, web fonts, analytics, remote images or remote saving. Everything it needs is inside the file, plus the local `images/` folder beside it for a quiz with images, and it works offline.
 
 ### Sharing on Telegram
 
@@ -104,5 +124,7 @@ Telegram Desktop warns that opening a file may reveal your IP address. It shows 
 - Answer key, auto-marking or instant feedback inside the HTML page.
 - Autosave to a file in Firefox and Safari: those browsers have no API for it. Use Export.
 - Hosting the quiz online. The page is a local file.
-- Any network request from the page.
-- Images in questions (tracked in [`docs/specs/TODO.md`](docs/specs/TODO.md)).
+- Any network request from the page, including remote images (`http://`, `https://`, `//`).
+- Embedding images inside the `.html` (base64). The page references image files in `images/`; ship the `.html` and `images/` together in one folder.
+- Generating new diagrams or pictures in `/generate-quiz-docs`. It only reuses existing images.
+- Zipping the output. Zip the `<name>/` folder yourself.
