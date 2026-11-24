@@ -89,11 +89,14 @@ Starting branch: `main`
   - Image line placement: in the stem on its own line, after the stem text and before the options; also inside option text, `- a. ![alt](images/x.png)` (user: "ok to assumed").
   - No remote images (docs: README "No network requests").
 - **Acceptance criteria:**
-  - [ ] `questions-format.md` has an **Images** section covering: line format, the path rule from **Interfaces**, allowed extensions, placement in stem, option images, no remote URLs, Answers doc repeats the same image lines (read).
-  - [ ] `quiz-rules.md` has an **Images** section covering: `images/` folder next to the docs, naming, the 5 crop steps with the must-not-contain list, user-supplied images, `.docx` insertion (read).
-  - [ ] `grep -n "PIL" skills/format-quiz-docs/quiz-rules.md` matches.
-  - [ ] `grep -n "images/" skills/format-quiz-docs/questions-format.md skills/format-quiz-docs/quiz-rules.md` matches in both files.
+  - [x] `questions-format.md` has an **Images** section covering: line format, the path rule from **Interfaces**, allowed extensions, placement in stem, option images, no remote URLs, Answers doc repeats the same image lines (read).
+  - [x] `quiz-rules.md` has an **Images** section covering: `images/` folder next to the docs, naming, the 5 crop steps with the must-not-contain list, user-supplied images, `.docx` insertion (read).
+  - [x] `grep -n "PIL" skills/format-quiz-docs/quiz-rules.md` matches.
+  - [x] `grep -n "images/" skills/format-quiz-docs/questions-format.md skills/format-quiz-docs/quiz-rules.md` matches in both files.
 - **Doc deltas:** these files are the doc.
+  - Crops are saved as `.png`; user-supplied images keep their extension. Why: Pillow writes PNG losslessly; no doc beyond `quiz-rules.md`.
+  - Images in one question are numbered stem first, then options a, b, c. Why: gives a fixed order for `-2`, `-3` suffixes; recorded in `quiz-rules.md`.
+  - Image lines may not go in the title or question header. Why: the header is one parsed line; recorded in `questions-format.md`.
 
 ### S2 — Template renders images
 
