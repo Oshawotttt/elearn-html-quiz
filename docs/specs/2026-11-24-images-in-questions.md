@@ -196,7 +196,7 @@ Starting branch: `main`
 - **Blocked by:** S5
 - **Branch:** `feat/question-images`
 - **Order on branch:** 6
-- **Files:** `.gitignore` (new), `tests/visual/` (ignored: `make-fixture.py`, `fixture/`, `out/`)
+- **Files:** `.gitignore` (new), `tests/visual/` (ignored: `make-fixture.py`, `fixture/`, `out/`), `skills/build-quiz-html/SKILL.md` (step 8 grep fix found by the run)
 - **Seams:** the skills as a user runs them, through a fresh subagent.
 - **Decisions:**
   - "create a test file for visual test only. for this, at the end create an example html inside. gitigonore pls" (user).
@@ -205,13 +205,15 @@ Starting branch: `main`
   - The skills are run by a fresh subagent that reads each `SKILL.md` and follows its steps, since `disable-model-invocation: true` blocks invoking them (docs: `d:\SMU\quizzer\CLAUDE.md`, **Testing skills**). One subagent per skill run.
   - Run 1: `format-quiz-docs` with arguments `md tests/visual/out`, source `tests/visual/fixture/`. Run 2: `build-quiz-html` with arguments `tests/visual/out/Visual-Test-Questions.md tests/visual/out`.
 - **Acceptance criteria:**
-  - [ ] `git check-ignore tests/visual/out/Visual-Test/Visual-Test.html` prints the path.
-  - [ ] `git status --porcelain` lists no file under `tests/visual/`.
-  - [ ] `tests/visual/out/` contains `Visual-Test-Questions.md`, `Visual-Test-Answers.md`, `images/Visual-Test-Q1.png`, `Visual-Test/Visual-Test.html` and `Visual-Test/images/Visual-Test-Q1.png` (`ls -R`).
-  - [ ] `Visual-Test-Questions.md` has an image line in Q1's stem and image lines in Q2's options a and b (`grep -n "!\["`).
-  - [ ] Every `images/...` path in `Visual-Test/Visual-Test.html` exists under `Visual-Test/images/` (`grep -o` plus `ls`).
-  - [ ] `Visual-Test/Visual-Test.html` contains no `{{` placeholder (`grep -c "{{"` prints `0`).
+  - [x] `git check-ignore tests/visual/out/Visual-Test/Visual-Test.html` prints the path.
+  - [x] `git status --porcelain` lists no file under `tests/visual/`.
+  - [x] `tests/visual/out/` contains `Visual-Test-Questions.md`, `Visual-Test-Answers.md`, `images/Visual-Test-Q1.png`, `Visual-Test/Visual-Test.html` and `Visual-Test/images/Visual-Test-Q1.png` (`ls -R`).
+  - [x] `Visual-Test-Questions.md` has an image line in Q1's stem and image lines in Q2's options a and b (`grep -n "!\["`).
+  - [x] Every `images/...` path in `Visual-Test/Visual-Test.html` exists under `Visual-Test/images/` (`grep -o` plus `ls`).
+  - [x] `Visual-Test/Visual-Test.html` contains no `{{` placeholder (`grep -c "{{"` prints `0`).
 - **Doc deltas:** none. The **Testing skills** rule is already in `d:\SMU\quizzer\CLAUDE.md`.
+  - `build-quiz-html/SKILL.md` step 8 now greps `images/[A-Za-z0-9._-]+\.(png|jpe?g|gif|webp)`. Why: the old pattern also matched a bare `images/` in the template's own code, so `ls` on it passed whatever the folder held; the skill file is the doc.
+  - Fixture Q2 marks option b with a tick (empty box, not correct). Why: a cross there means "b is correct" under the eLearn table, which contradicted the fixture's "Correct answer: a"; the first run's output was made before this fix, but its crops and answers (a only) are the same.
 
 ## Human checks
 
