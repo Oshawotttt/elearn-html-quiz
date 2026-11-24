@@ -145,9 +145,11 @@ Starting branch: `main`
   - Step 6 check adds: every image path in the `.html` exists under `<name>/images/`.
   - Report: the folder path and that it is the thing to zip and send.
 - **Acceptance criteria:**
-  - [ ] `SKILL.md` describes both layouts, the copy step, the missing-image stop, the overwrite rule and the extra check (read).
-  - [ ] `grep -n "images/" skills/build-quiz-html/SKILL.md` matches.
+  - [x] `SKILL.md` describes both layouts, the copy step, the missing-image stop, the overwrite rule and the extra check (read).
+  - [x] `grep -n "images/" skills/build-quiz-html/SKILL.md` matches.
 - **Doc deltas:** README: build-quiz-html output layout with images; zip the `<name>/` folder to share.
+  - Image paths are relative to the folder of the Questions.md, and copied files keep the name and case written in the image line. Why: the page loads the path as written, and some hosts are case-sensitive; recorded in `build-quiz-html/SKILL.md`.
+  - The skill description now says the output is a folder when the quiz has images. Why: the old text said "single self-contained" page; no other doc.
 
 ### S4 — Format and generate skills handle images
 
